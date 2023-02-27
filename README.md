@@ -17,12 +17,18 @@ IRIS,WebGatewayはPCからアクセス可能なLinux上のコンテナやwsl2上
 ```
 2. iris-oauth2.gitで作成したssl/web/all.crtをc:\tempにコピー。
 ```
+[VM]
 scp irismeister@webgw.localdomain:~/iris-oauth2/ssl/web/all.crt c:\temp\all.crt
+[WSL2]
+cp ssl/web/all.crt /mnt/c/temp 
 ```
 
 3. iris-oauth2.gitでstart.sh実行時に表示されるjsonの内容を.\credentials.jsonにコピー。
 ```
+[VM]
 scp irismeister@webgw.localdomain:~/iris-oauth2/client/credentials_python.json c:\git\python-oauth2\credentials.json
+[WSL2]
+cp client/credentials_python.json /mnt/c/git/python-oauth2-client/credentials.json
 ```
 
 4. ホスト名webgw.localdomainでiris-oauth2.gitが動作している環境にアクセスできるように、hostsファイルを編集
