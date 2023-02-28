@@ -7,6 +7,9 @@ import os
 import ssl
 import base64
 import pprint
+import string
+import random
+import hashlib
 from oauthlib.oauth2 import WebApplicationClient
 from webbrowser import open_new
 from httpserverhandler import AccessTokenHandler
@@ -15,7 +18,7 @@ from httpserverhandler import AccessTokenHandler
 SCOPES = ['openid','profile','scope1','scope2','patient/*.read']
 
 
-def p(str):
+def print_section(str):
     print('\n'+'***** '+str+' *****')
 
 def decode(token):
@@ -29,13 +32,23 @@ def getresponse(method,title,endpoint,headers,data):
     req = urllib.request.Request(endpoint, json.dumps(data).encode("utf-8"), headers=headers,method=method)
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     context.load_verify_locations(os.environ['REQUESTS_CA_BUNDLE'])
-    p('response from '+title+' endpoint')
+    print_section('response from '+title+' endpoint')
     try:
       with urllib.request.urlopen(req,context=context) as res:
         body = json.load(res)
         pp.pprint(body)
     except urllib.error.HTTPError as err:
         print(err)
+
+def generate_code() -> tuple[str, str]:
+    rand = random.SystemRandom()
+    code_verifier = ''.join(rand.choices(string.ascii_letters + string.digits, k=128))
+
+    code_sha_256 = hashlib.sha256(code_verifier.encode('utf-8')).digest()
+    b64 = base64.urlsafe_b64encode(code_sha_256)
+    code_challenge = b64.decode('utf-8').replace('=', '')
+
+    return (code_verifier, code_challenge)
 
 def main():
 
@@ -59,14 +72,17 @@ def main():
     auth_uri=json_data['authorization_endpoint']
     token_uri=json_data['token_endpoint']
 
+    # pkce
+    code_verifier, code_challenge = generate_code()
+
     # 自力でlocalにweb server立てる例 https://qiita.com/kai_kou/items/d03abd6012f32071c1aa
     oauth = WebApplicationClient(client_id)
-    auth_url, headers, body = oauth.prepare_authorization_request(auth_uri, redirect_url=redirect_uri, scope=SCOPES)
-    p('auth_url')
+    auth_url, headers, body = oauth.prepare_authorization_request(auth_uri, redirect_url=redirect_uri, scope=SCOPES,code_challenge= code_challenge, code_challenge_method = "S256")
+    print_section('auth_url')
     print(auth_url)
-    p('headers')
+    print_section('headers')
     print(headers)
-    p('body')
+    print_section('body')
     print(body)
 
     token_handler = AccessTokenHandler(auth_url,token_uri,client_id, client_secret)
@@ -119,7 +135,7 @@ def main():
         oauth.parse_request_body_response(res.read())
     #print(oauth.token_type)
     #print(oauth.expires_in)
-    p('refreshed access token')
+    print_section('refreshed access token')
     decode(oauth.access_token)
 
 if __name__ == '__main__':
