@@ -85,7 +85,7 @@ def main():
     print_section('body')
     print(body)
 
-    token_handler = AccessTokenHandler(auth_url,token_uri,client_id, client_secret)
+    token_handler = AccessTokenHandler(auth_url,token_uri,client_id, client_secret,code_verifier)
     state,res_in_bytes=token_handler.get_access_token()
 
     # 認可サーバからの応答をパースする
@@ -94,16 +94,16 @@ def main():
     id_token=oauth.token['id_token']
     refresh_token=oauth.refresh_token
 
-    p ('decoded access token')
+    print_section('decoded access token')
     decode(access_token)
-    p ('decoded id token')
+    print_section('decoded id token')
     decode(id_token)
-    p ('state')
+    print_section('state')
     print(oauth.state)
-    p ('scope')
+    print_section('scope')
     print(oauth.token.scope)
 
-    p ('dumping all token')
+    print_section('dumping all token')
     pp.pprint(oauth.token)
 
     data = {

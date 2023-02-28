@@ -50,3 +50,4 @@ Python 3.10.9
 こちらのサイトを参考にさせていただきました。
 
 https://qiita.com/hoto17296/items/2d2cb76d323099e9f8ab
+https://www.camiloterevinto.com/post/oauth-pkce-flow-from-python-desktop
