@@ -15,8 +15,9 @@ from webbrowser import open_new
 from httpserverhandler import AccessTokenHandler
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ['openid','profile','scope1','scope2','patient/*.read']
-
+# SCOPES = ['openid','profile','scope1','scope2','patient/*.read']
+# IRIS need this in alphabetic order
+SCOPES = ['openid','patient/*.read','profile','scope1','scope2']
 
 def print_section(str):
     print('\n'+'***** '+str+' *****')
