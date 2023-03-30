@@ -17,7 +17,7 @@ from httpserverhandler import AccessTokenHandler
 # If modifying these scopes, delete the file token.json.
 # SCOPES = ['openid','profile','scope1','scope2','patient/*.read']
 # IRIS need this in alphabetic order
-SCOPES = ['openid','patient/*.read','profile','scope1','scope2']
+SCOPES = ['openid','profile','scope1','scope2']
 
 def print_section(str):
     print('\n'+'***** '+str+' *****')
@@ -72,6 +72,7 @@ def main():
 
     auth_uri=json_data['authorization_endpoint']
     token_uri=json_data['token_endpoint']
+    revocation_uri=json_data['revocation_endpoint']
 
     # pkce
     code_verifier, code_challenge = generate_code()
@@ -136,8 +137,30 @@ def main():
         oauth.parse_request_body_response(res.read())
     #print(oauth.token_type)
     #print(oauth.expires_in)
+    print_section('refreshed')
+    pp.pprint(oauth.token)
     print_section('refreshed access token')
     decode(oauth.access_token)
+
+    access_token=oauth.access_token
+    id_token=oauth.token['id_token']
+
+
+    #
+    # revocationの呼び出し (RTをRevokeすれば次回refresh tokenを使用を試みたら失敗するはず)
+    #
+    url, headers, body = oauth.prepare_token_revocation_request(revocation_uri,token=refresh_token,token_type_hint='refresh_token')
+    encodedData = base64.b64encode(bytes(f"{client_id}:{client_secret}", "ISO-8859-1")).decode("ascii")
+    headers['Authorization'] = 'Basic '+encodedData
+
+    req = urllib.request.Request(url, body.encode(), headers=headers)
+    with urllib.request.urlopen(req,context=context) as res:
+        print('url:', res.geturl())
+        print('code:', res.getcode())
+        print('Content-Type:', res.info()['Content-Type'])
+        print(res.read())
+
+    exit()
 
 if __name__ == '__main__':
     pp = pprint.PrettyPrinter(indent=4)   
