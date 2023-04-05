@@ -119,9 +119,9 @@ def main():
     getresponse('POST','userinfo','https://webgw.localdomain/irisauth/authserver/oauth2/userinfo',headers,data)
 
     # Resource server #1にaccess_tokenを添えて、RESTアクセスする。
-    getresponse('POST','resource server #1','https://webgw.localdomain/irisrsc/csp/MYAPP/private',headers,data)
+    getresponse('POST','resource server #1','https://webgw.localdomain/irisrsc/csp/myrsc/private',headers,data)
     # Resource server #2にaccess_tokenを添えて、RESTアクセスする。
-    getresponse('POST','resource server #2','https://webgw.localdomain/irisrsc2/csp/MYAPP/private',headers,data)
+    getresponse('POST','resource server #2','https://webgw.localdomain/irisrsc2/csp/myrsc/private',headers,data)
 
     #
     # refresh tokenを使用
