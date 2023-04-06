@@ -146,19 +146,25 @@ def main():
     id_token=oauth.token['id_token']
 
 
-    #
-    # revocationの呼び出し (RTをRevokeすれば次回refresh tokenを使用を試みたら失敗するはず)
-    #
-    url, headers, body = oauth.prepare_token_revocation_request(revocation_uri,token=refresh_token,token_type_hint='refresh_token')
-    encodedData = base64.b64encode(bytes(f"{client_id}:{client_secret}", "ISO-8859-1")).decode("ascii")
-    headers['Authorization'] = 'Basic '+encodedData
+    # Logout 
+    logout_url='https://webgw.localdomain/irisauth/authserver/oauth2/logout?id_token_hint='+id_token+'&post_logout_redirect_uri=http://localhost:8080/fclogout&state='+state
+    open_new(logout_url)
 
-    req = urllib.request.Request(url, body.encode(), headers=headers)
-    with urllib.request.urlopen(req,context=context) as res:
-        print('url:', res.geturl())
-        print('code:', res.getcode())
-        print('Content-Type:', res.info()['Content-Type'])
-        print(res.read())
+
+    ##
+    ## revocationの呼び出しテスト (RTをRevokeすれば次回refresh tokenを使用を試みたら失敗するはず)
+    ##
+
+    #url, headers, body = oauth.prepare_token_revocation_request(revocation_uri,token=refresh_token,token_type_hint='refresh_token')
+    #encodedData = base64.b64encode(bytes(f"{client_id}:{client_secret}", "ISO-8859-1")).decode("ascii")
+    #headers['Authorization'] = 'Basic '+encodedData
+
+    #req = urllib.request.Request(url, body.encode(), headers=headers)
+    #with urllib.request.urlopen(req,context=context) as res:
+    #    print('url:', res.geturl())
+    #    print('code:', res.getcode())
+    #    print('Content-Type:', res.info()['Content-Type'])
+    #    print(res.read())
 
     exit()
 
